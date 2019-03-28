@@ -1,0 +1,105 @@
+---
+title: "Lab 4"
+author: "Ravi Patel, rspatel"
+date: "March 26, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(tidyverse)
+defense <- read_excel('cyclonesFootball2018.xlsx', sheet='Defensive')
+offensive <- read_excel('cyclonesFootball2018.xlsx', sheet='Offensive')
+biograpghy <- read_excel('cyclonesFootball2018.xlsx', sheet='Biography')
+```
+
+Cleaning
+```{r}
+defense$Name <- as.factor(defense$Name)
+defense$Opponent_Opponent <- as.factor(defense$Opponent_Opponent)
+
+offensive$Name <- as.factor(offensive$Name)
+offensive$Opponent_Opponent <- as.factor(offensive$Opponent_Opponent)
+
+biograpghy$Name <- as.factor(biograpghy$Name)
+```
+
+```{r}
+
+defense <- defense %>%
+  mutate_if(is.character, as.numeric)
+
+offensive <- offensive %>%
+  mutate_if(is.character, as.numeric)
+
+```
+
+```{r}
+defClean <- defense
+offClean <- offensive
+bioClean <- biograpghy
+
+str(defClean)
+str(offClean)
+str(bioClean)
+```
+
+```{r}
+defClean <- gather(defClean, "Statistic", "Value", -c(1,2))
+```
+
+
+It is rare to have more than one count of the three turnover types.
+```{r}
+library(ggplot2)
+ggplot(defClean, aes(x=Value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~Statistic)
+```
+
+It appears that ISU played better defense versus Kansas State.
+```{r}
+def3 <- defClean %>%
+  filter(Statistic == "Tackles_Solo") %>%
+  filter(Opponent_Opponent == "West Virginia" | Opponent_Opponent == "Kansas State") %>%
+  spread(Opponent_Opponent, Value)
+
+def3[is.na(def3)] <- 0
+
+ggplot(def3, aes(x=`West Virginia`, y=`Kansas State`)) + 
+  geom_count() +
+  labs(
+    x = "West Virgina",
+    y = "Kansas State",
+    title = "Tackles Solo per Player per University"
+  )
+```
+
+```{r}
+bio <- separate(bioClean, Hometown, c("City", "State"), sep=",")
+head(bio)
+```
+
+
+```{r}
+PlayersPerState <- bio %>%
+  group_by(State) %>%
+  summarise(
+    n = n()
+  )
+
+ggplot(PlayersPerState, aes(x=State, y=n)) +
+  geom_bar(stat="identity") + 
+  labs(
+    x = "State",
+    y = "Number of Players",
+    title = "Number of Player per State"
+  ) +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+
