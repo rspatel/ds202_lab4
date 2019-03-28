@@ -17,7 +17,8 @@ offensive <- read_excel('cyclonesFootball2018.xlsx', sheet='Offensive')
 biograpghy <- read_excel('cyclonesFootball2018.xlsx', sheet='Biography')
 ```
 
-Cleaning
+Question 1:
+Cleaning the data.
 ```{r}
 defense$Name <- as.factor(defense$Name)
 defense$Opponent_Opponent <- as.factor(defense$Opponent_Opponent)
@@ -28,6 +29,8 @@ offensive$Opponent_Opponent <- as.factor(offensive$Opponent_Opponent)
 biograpghy$Name <- as.factor(biograpghy$Name)
 ```
 
+Question 2:
+Setting the correct types.
 ```{r}
 
 defense <- defense %>%
@@ -38,6 +41,7 @@ offensive <- offensive %>%
 
 ```
 
+Creating new df variables according to the lab document and showing each's structure.
 ```{r}
 defClean <- defense
 offClean <- offensive
@@ -48,12 +52,15 @@ str(offClean)
 str(bioClean)
 ```
 
+Tidying the data
+
+Question 1:
 ```{r}
 defClean <- gather(defClean, "Statistic", "Value", -c(1,2))
 ```
 
-
-It is rare to have more than one count of the three turnover types.
+Quesiton 2:
+Based upon the graphs, it is rare to have more than one count of the three turnover types.
 ```{r}
 library(ggplot2)
 ggplot(defClean, aes(x=Value)) +
@@ -61,6 +68,7 @@ ggplot(defClean, aes(x=Value)) +
   facet_wrap(~Statistic)
 ```
 
+Question 3:
 It appears that ISU played better defense versus Kansas State.
 ```{r}
 def3 <- defClean %>%
@@ -79,12 +87,15 @@ ggplot(def3, aes(x=`West Virginia`, y=`Kansas State`)) +
   )
 ```
 
+Tidying Part 2
+
+Question 1:
 ```{r}
 bio <- separate(bioClean, Hometown, c("City", "State"), sep=",")
 head(bio)
 ```
 
-
+Question 2:
 ```{r}
 PlayersPerState <- bio %>%
   group_by(State) %>%
