@@ -113,4 +113,30 @@ ggplot(PlayersPerState, aes(x=State, y=n)) +
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
 ```
 
+Joining Data Frames
 
+Question 1:
+```{r}
+offBio <- inner_join(offClean, bioClean, by="Name")
+```
+
+Question 2:
+Based on the grapgh there appears to be no relation between receving yards and player weight.
+```{r}
+wToYards <- offBio %>%
+  group_by(Name) %>%
+  summarise(
+    Yards = mean(Receiving_YDS),
+    Weight = Weight[1]
+  )
+
+wToYards <- wToYards[complete.cases(wToYards), ]
+
+ggplot(wToYards, aes(x=Weight, y=Yards)) + 
+  geom_point() +
+  labs(
+    x = "Player Weight",
+    y = "Receiving Yards",
+    title = "Receiving Yards per Player Weight"
+  )
+```
